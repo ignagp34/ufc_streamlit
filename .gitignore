@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.env
+.DS_Store
+ufc-master.csv
+ufc-master.xlsx
+ufc_cleaned.csv
+.streamlit/
