@@ -131,7 +131,7 @@ with tab1:
         height=600,
         xaxis={'categoryorder':'array', 'categoryarray': available_classes}
     )
-    st.plotly_chart(fig_phys, use_container_width=True)
+    st.plotly_chart(fig_phys, width='stretch')
     
     st.markdown(f"> **Mejora Visual:** Ahora las categorías están ordenadas por peso ascendente para facilitar la comparación de escalas.")
 
@@ -159,7 +159,7 @@ with tab2:
         height=700
     )
     fig_strat.update_traces(marker=dict(size=8, opacity=0.7))
-    st.plotly_chart(fig_strat, use_container_width=True)
+    st.plotly_chart(fig_strat, width='stretch')
 
 # --- Tab 3: Dimensión Mercado ---
 with tab3:
@@ -182,7 +182,7 @@ with tab3:
         color_discrete_map={'Favorite': '#00CC96', 'Underdog': '#FF4B4B', 'PickEm': '#636EFA'}
     )
     fig_mkt.update_layout(yaxis_title="Porcentaje de Victorias (%)", height=500)
-    st.plotly_chart(fig_mkt, use_container_width=True)
+    st.plotly_chart(fig_mkt, width='stretch')
     
     st.subheader("Evolución Temporal de la Eficiencia")
     df_yearly = df_filtered.groupby('Year')['BettingResult'].value_counts(normalize=True).unstack().fillna(0)
@@ -197,7 +197,7 @@ with tab3:
             labels={'FavoritePct': '% Victorias Favorito', 'Year': 'Año'}
         )
         fig_trend.update_traces(line_color='#00CC96')
-        st.plotly_chart(fig_trend, use_container_width=True)
+        st.plotly_chart(fig_trend, width='stretch')
 
 # --- Tab 4: Factor Edad ---
 with tab4:
@@ -217,7 +217,7 @@ with tab4:
             color_discrete_sequence=['#AB63FA']
         )
         fig_age_dist.update_layout(bargap=0.1, xaxis_title="Edad del Ganador (Años)")
-        st.plotly_chart(fig_age_dist, use_container_width=True)
+        st.plotly_chart(fig_age_dist, width='stretch')
 
     with col_age2:
         # Edad vs Diferencia de Edad
@@ -237,7 +237,7 @@ with tab4:
             bargap=0.1,
             shapes=[dict(type="line", x0=0, x1=0, y0=0, y1=1, yref="paper", line=dict(color="white", dash="dash"))]
         )
-        st.plotly_chart(fig_age_diff, use_container_width=True)
+        st.plotly_chart(fig_age_diff, width='stretch')
         st.caption("Valores negativos (izq) indican que el Ganador era MÁS JOVEN que el perdedor.")
 
 # --- Tab 5: Momento Finalización ---
@@ -260,7 +260,7 @@ with tab5:
             category_orders={"Finish": ["KO/TKO", "SUB", "DQ"]}
         )
         fig_rounds.update_layout(xaxis=dict(tickmode='linear', tick0=1, dtick=1))
-        st.plotly_chart(fig_rounds, use_container_width=True)
+        st.plotly_chart(fig_rounds, width='stretch')
     else:
         st.info("No hay suficientes datos de finalizaciones para el filtro seleccionado.")
     
