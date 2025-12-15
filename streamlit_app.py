@@ -71,9 +71,14 @@ df_filtered = df_filtered[df_filtered['WeightClass'].isin(selected_classes)]
 st.sidebar.markdown("### 📊 Dataset Info")
 st.sidebar.info(f"Mostrando {len(df_filtered)} peleas.")
 
+if df_filtered.empty:
+    st.warning("⚠️ No hay peleas que coincidan con los filtros seleccionados. Por favor, amplía el rango de años o selecciona más categorías.")
+    st.stop()
+
 # --- Main Dashboard ---
 st.title("🥊 Análisis de Rendimiento y Mercado UFC")
 st.markdown("### Explorando las dimensiones Física, Estratégica y de Mercado de los ganadores.")
+st.markdown("Samuel Rodríguez Caballero, Víctor Tomeno Gómez, Ignacio González Peris")
 st.markdown("---")
 
 # KPIs
@@ -93,7 +98,7 @@ with col4:
 st.markdown("---")
 
 # Tabs for Dimensions
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["📏 Dimensión Física", "🧠 Dimensión Estratégica", "💰 Dimensión Mercado", "🕰️ Factor Edad", "🏁 Momento Finalización"])
+tab1, tab3, tab4, tab5 = st.tabs(["📏 Dimensión Física", "💰 Dimensión Mercado", "🕰️ Factor Edad", "🏁 Momento Finalización"])
 
 # --- Tab 1: Dimensión Física ---
 with tab1:
@@ -133,37 +138,9 @@ with tab1:
     )
     st.plotly_chart(fig_phys, width='stretch')
     
-    st.markdown(f"> **Mejora Visual:** Ahora las categorías están ordenadas por peso ascendente para facilitar la comparación de escalas.")
-
-# --- Tab 2: Dimensión Estratégica ---
-with tab2:
-    st.header("2. Estilos de Victoria: ¿Volumen vs Control?")
-    st.markdown("Mapeo de ganadores basado en sus promedios históricos de golpeo y derribo.")
-    
-    fig_strat = px.scatter(
-        df_filtered,
-        x='WinnerAvgStrikes',
-        y='WinnerAvgTD',
-        color='Finish',
-        hover_data=['Date', 'WeightClass'],
-        title="Estilo del Ganador: Golpes Significativos vs Derribos Promedio",
-        labels={'WinnerAvgStrikes': 'Golpes Significativos (Promedio por 15m)', 'WinnerAvgTD': 'Derribos (Promedio por 15m)'},
-        template="plotly_dark",
-        color_discrete_map={
-            'KO/TKO': '#FF4B4B', 
-            'SUB': '#FFA500', 
-            'U-DEC': '#00CC96', 
-            'S-DEC': '#AB63FA',
-            'M-DEC': '#19D3F3'
-        },
-        height=700
-    )
-    fig_strat.update_traces(marker=dict(size=8, opacity=0.7))
-    st.plotly_chart(fig_strat, width='stretch')
-
 # --- Tab 3: Dimensión Mercado ---
 with tab3:
-    st.header("3. Eficiencia del Mercado de Apuestas")
+    st.header("2. Eficiencia del Mercado de Apuestas")
     st.markdown("¿Con qué frecuencia ganan los favoritos frente a las sorpresas (Underdogs)?")
     
     betting_counts = df_filtered['BettingResult'].value_counts(normalize=True).reset_index()
@@ -186,6 +163,7 @@ with tab3:
     
     st.subheader("Evolución Temporal de la Eficiencia")
     df_yearly = df_filtered.groupby('Year')['BettingResult'].value_counts(normalize=True).unstack().fillna(0)
+    
     if 'Favorite' in df_yearly.columns:
         df_yearly['FavoritePct'] = df_yearly['Favorite'] * 100
         fig_trend = px.line(
@@ -196,12 +174,13 @@ with tab3:
             template="plotly_dark",
             labels={'FavoritePct': '% Victorias Favorito', 'Year': 'Año'}
         )
+        fig_trend.update_layout(yaxis_range=[0, 100])
         fig_trend.update_traces(line_color='#00CC96')
         st.plotly_chart(fig_trend, width='stretch')
 
 # --- Tab 4: Factor Edad ---
 with tab4:
-    st.header("4. Juventud vs Experiencia")
+    st.header("3. Juventud vs Experiencia")
     st.markdown("¿La edad es solo un número? Analizamos la distribución de edad de los campeones.")
 
     col_age1, col_age2 = st.columns(2)
@@ -242,7 +221,7 @@ with tab4:
 
 # --- Tab 5: Momento Finalización ---
 with tab5:
-    st.header("5. ¿Cuándo terminan las peleas?")
+    st.header("4. ¿Cuándo terminan las peleas?")
     st.markdown("Análisis del asalto (round) de finalización según el método de victoria.")
     
     # Filter only finishes (not Decisions)

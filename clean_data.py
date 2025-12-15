@@ -90,6 +90,69 @@ def clean_data():
     for col in numeric_cols:
         df[col] = pd.to_numeric(df[col], errors='coerce')
 
+    # Erase catch weights
+    df = df.drop(df[df['WeightClass'] == 'Catch Weight'].index)
+
+    # Fix finish round
+    df['FinishRound'] = df['FinishRound'].apply(lambda x: int(round(x/10)) if pd.notna(x) else x)
+
+    # Fix height and reach metrics (in cms)
+    def fix_metric(value):
+        # If greater than 10000 (ej. 17272), it has 2 digits -> divide by 100
+        if value >= 10000:
+            val = value / 100.0
+        # If lower (ej. 1651), 1 digit -> divide by 10
+        elif value >= 1000:
+            val = value / 10.0
+        else:
+            val = value
+        return int(round(val))
+
+    # Apply height correction to relevant columns
+    metric_columns = ['RedHeightCms', 'BlueHeightCms', 'WinnerHeight','RedHeightCms', 'BlueHeightCms',
+                       'WinnerHeight','RedReachCms', 'BlueReachCms', 'WinnerReach']
+    for col in metric_columns:
+        df[col] = df[col].apply(fix_metric)
+
+    # Fix TotalFightTimeSecs: divide by 10
+    df['TotalFightTimeSecs'] = df['TotalFightTimeSecs'].apply(lambda x: int(round(x / 10.0)) if pd.notna(x) else x)
+
+    def fix_metric2(val, metric_type):
+        if pd.isna(val) or val == 0:
+            return val
+        
+        # Logic range: 0 a ~15 strikes per minute
+        if metric_type == 'strikes':
+            # 2 digits (e.g 67, 25),  x10 -> 6.7, 2.5
+            if val < 100: 
+                return val / 10
+            # 3 digits (e.g. 717),  x100 -> 7.17
+            elif val < 1000:
+                return val / 100
+            else:
+                while val > 20:
+                    val = val / 10
+                return val
+
+        elif metric_type == 'takedowns':
+            if val < 100:
+                return val / 100
+            elif val < 1000:
+                return val / 100
+            else:
+                while val > 15:
+                    val = val / 10
+                return val
+
+    strike_cols = ['RedAvgSigStrLanded', 'BlueAvgSigStrLanded', 'WinnerAvgStrikes']
+    td_cols = ['RedAvgTDLanded', 'BlueAvgTDLanded', 'WinnerAvgTD']
+
+    for col in strike_cols:
+        df[col] = df[col].apply(lambda x: fix_metric2(x, 'strikes'))
+
+    for col in td_cols:
+        df[col] = df[col].apply(lambda x: fix_metric2(x, 'takedowns'))
+
     # Drop rows with critical missing info for the main plots
     df_clean = df.dropna(subset=['WinnerHeight', 'WinnerReach', 'BettingResult', 'WinnerAge'])
 

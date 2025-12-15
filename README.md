@@ -35,7 +35,6 @@ Este proyecto visualiza datos históricos de la UFC para analizar tendencias cla
 
 ## 📈 Funcionalidades
 *   **Dimensión Física**: Análisis de altura y alcance.
-*   **Dimensión Estratégica**: Clustering de estilos (Strikers vs Grapplers).
 *   **Dimensión Mercado**: Rentabilidad de favoritos vs underdogs.
 *   **Factor Edad**: Impacto de la juventud en el resultado.
 *   **Análisis de Finalización**: Distribución de rondas de finish.
