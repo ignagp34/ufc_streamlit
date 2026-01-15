@@ -3,6 +3,5 @@ __pycache__/
 .env
 .DS_Store
 ufc-master.xlsx
-ufc_cleaned.csv
 .streamlit/
 ufc/
